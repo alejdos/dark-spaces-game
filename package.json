@@ -1,0 +1,10 @@
+{
+  "name": "dark-spaces",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless backend function and static frontend for the Dark Spaces game.",
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.10.0"
+  }
+}
