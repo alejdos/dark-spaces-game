@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/get-briefing.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
