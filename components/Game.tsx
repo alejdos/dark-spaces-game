@@ -90,6 +90,9 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
     case 'TICK':
         {
+        if (!state.gameStarted || !state.player.id) {
+            return state; // CRITICAL FIX: Do not run logic until the game is initialized
+        }
         const { timestamp } = action.payload;
         // Create copies to avoid direct mutation
         let player = clone(state.player);
@@ -180,7 +183,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
         const newExplosions: Explosion[] = [];
         projectiles.forEach(p => {
-            if (p.position.x < -100) return; // Already hit something
+            if (p.position.x < -1000) return; // Already hit something
 
             if (p.isPlayerProjectile) {
                 enemies.forEach(e => {
@@ -215,7 +218,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         });
 
         // --- Cleanup & State Update ---
-        const nextProjectiles = projectiles.filter(p => p.position.x > -100 && p.position.x < GAME_WIDTH + 100 && p.position.y > -100 && p.position.y < GAME_HEIGHT + 100);
+        const nextProjectiles = projectiles.filter(p => p.position.x > -1000 && p.position.x < GAME_WIDTH + 100 && p.position.y > -100 && p.position.y < GAME_HEIGHT + 100);
         const nextEnemies = enemies.filter(e => !e.isDestroyed);
         const nextExplosions = explosions.map(e => ({...e, life: e.life - 1})).filter(e => e.life > 0).concat(newExplosions);
         
