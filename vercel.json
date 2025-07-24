@@ -1,7 +1,14 @@
+
 {
   "functions": {
     "api/get-briefing.js": {
-      "runtime": "nodejs18.x"
+      "runtime": "edge"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!api/|.*\\.).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
