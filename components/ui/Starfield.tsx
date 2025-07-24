@@ -16,30 +16,26 @@ const Starfield: React.FC = () => {
 
     const init = () => {
       if (!canvas) return;
-      // Set canvas size
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Reset stars array
       stars.length = 0;
       
-      // Create stars
       for (let i = 0; i < numStars; i++) {
         stars.push({
           x: (Math.random() - 0.5) * canvas.width,
           y: (Math.random() - 0.5) * canvas.height,
-          z: Math.random() * canvas.width, // Start with random depth
+          z: Math.random() * canvas.width,
         });
       }
     };
 
     const draw = () => {
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+      if (!canvas || !ctx || canvas.width === 0) {
         animationFrameId = requestAnimationFrame(draw);
         return;
       }
       
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -47,22 +43,25 @@ const Starfield: React.FC = () => {
       ctx.translate(canvas.width / 2, canvas.height / 2);
 
       stars.forEach(star => {
-        star.z -= 1; // Speed
-        
+        star.z -= 1; // Move star closer
+
+        // If star is behind the screen, reset it to the back
         if (star.z <= 0) {
           star.x = (Math.random() - 0.5) * canvas.width;
           star.y = (Math.random() - 0.5) * canvas.height;
           star.z = canvas.width;
         }
 
-        const k = 128 / star.z;
+        // This check is now safe because star.z was reset if it was <= 0
+        const k = 128.0 / star.z;
         const px = star.x * k;
         const py = star.y * k;
         
-        const radius = Math.max(0, (1 - star.z / canvas.width) * 2);
-        const opacity = Math.max(0, 1 - star.z / canvas.width);
-
+        const radius = (1 - star.z / canvas.width) * 2;
+        
+        // Only draw if the star is visible
         if (radius > 0) {
+            const opacity = 1 - star.z / canvas.width;
             ctx.beginPath();
             ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
             ctx.arc(px, py, radius, 0, Math.PI * 2);
