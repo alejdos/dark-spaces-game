@@ -1,35 +1,32 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Esta es una función Serverless/Edge. 
-// La mayoría de los proveedores de hosting (Vercel, Netlify, etc.) la manejarán automáticamente.
-// El objeto 'Request' es proporcionado por el entorno de ejecución del hosting.
-
-export default async function handler(req) {
+/**
+ * Esta es una función serverless de Node.js.
+ * El entorno de Vercel proporciona los objetos req (request) y res (response).
+ */
+export default async function handler(req, res) {
   // Asegurarse de que solo se acepten peticiones POST
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const { level, enemyTypes } = await req.json();
+    // En el entorno Node.js de Vercel, el body ya está parseado en req.body
+    const { level, enemyTypes } = req.body;
 
     // Validar la entrada
     if (!level || !Array.isArray(enemyTypes)) {
-       return new Response(JSON.stringify({ error: 'Invalid input' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+       return res.status(400).json({ error: 'Invalid input' });
     }
 
     // Inicializar la API de Gemini con la clave del entorno del servidor
     // process.env.API_KEY se debe configurar en el panel de control del hosting
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
-      throw new Error("API_KEY environment variable not set on the server.");
+      // Es mejor no exponer este error exacto al cliente por seguridad
+      console.error("API_KEY environment variable not set on the server.");
+      return res.status(500).json({ error: 'Internal server configuration error.' });
     }
     const ai = new GoogleGenAI({ apiKey });
 
@@ -66,16 +63,10 @@ export default async function handler(req) {
          throw new Error("Gemini API returned an empty response.");
       }
       
-      return new Response(JSON.stringify({ briefing: briefingText }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return res.status(200).json({ briefing: briefingText });
 
   } catch (error) {
     console.error("Error in serverless function:", error);
-    return new Response(JSON.stringify({ error: error.message || 'An internal server error occurred.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).json({ error: error.message || 'An internal server error occurred.' });
   }
 }
