@@ -1,8 +1,7 @@
 {
-  "builds": [
-    {
-      "src": "api/get-briefing.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/get-briefing.js": {
+      "runtime": "nodejs18.x"
     }
-  ]
+  }
 }
