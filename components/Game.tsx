@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useCallback, useReducer } from 'react';
 import { LevelConfig, Player, Enemy, Projectile, Vector2D, EnemyType, Explosion } from '../types';
 import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SETTINGS, ENEMY_SETTINGS, CONTROLS } from '../constants';
@@ -41,8 +42,14 @@ const initialState: GameState = {
   mousePos: { x: GAME_WIDTH / 2, y: 0 },
 };
 
-// Helper function for deep cloning
-const clone = <T,>(obj: T): T => JSON.parse(JSON.stringify(obj));
+/**
+ * Helper function for deep cloning.
+ * Changed to a standard function declaration to avoid TSX parsing ambiguity
+ * with generic arrow functions like <T,>(...).
+ */
+function clone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
